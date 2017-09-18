@@ -14,6 +14,7 @@ import {
 import { StackNavigator, TabNavigator } from 'react-navigation';
 
 import ImageBrowser from './ImageBrowser'
+import OpenedImage from './OpenedImage'
 
 
 let styles
@@ -25,16 +26,7 @@ class HomeScreen extends React.Component {
   }
 
   state = {
-    modalVisible: false,
-    photos: [],
-    index: null
-  }
-
-  setIndex = (index) => {
-    if (index === this.state.index) {
-      index = null
-    }
-    this.setState({ index })
+    photos: []
   }
 
   getPhotos = () => {
@@ -45,62 +37,23 @@ class HomeScreen extends React.Component {
     .then(r => this.setState({ photos: r.edges }))
   }
 
-  toggleModal = () => {
-    this.setState({ modalVisible: !this.state.modalVisible });
-  }
-
-  navigate = (params) => {
+  navigate = (route, params) => {
     const { navigate } = this.props.navigation
-    navigate('ImageBrowser', params)
+    params === null ? navigate(route) : navigate(route, params);
   }
 
   render() {
+    this.getPhotos()
     return (
       <View style={styles.container}>
         <Button
           title='View Photos'
-          onPress={() => { this.toggleModal(); this.getPhotos() } }
+          onPress={() => { this.navigate('OpenedImage', {photos: this.state.photos }) } }
         />
         <Button
           title='Take Picture'
-          onPress={() => { this.navigate({user: 'Lucy'}) } }
+          onPress={() => { this.navigate('ImageBrowser') } }
         />
-        <Modal
-          animationType={"slide"}
-          transparent={false}
-          visible={this.state.modalVisible}
-          onRequestClose={() => console.log('closed')}
-        >
-          <View style={styles.modalContainer}>
-            <Button
-              title='Close'
-              onPress={this.toggleModal}
-            />
-            <ScrollView
-              contentContainerStyle={styles.scrollView}>
-              {
-                this.state.photos.map((p, i) => {
-                  return (
-                    <TouchableHighlight
-                      style={{opacity: i === this.state.index ? 0.5 : 1}}
-                      key={i}
-                      underlayColor='transparent'
-                      onPress={() => this.setIndex(i)}
-                    >
-                      <Image
-                        style={{
-                          width: width/3,
-                          height: width/3
-                        }}
-                        source={{uri: p.node.image.uri}}
-                      />
-                    </TouchableHighlight>
-                  )
-                })
-              }
-            </ScrollView>
-          </View>
-        </Modal>
       </View>
     );
   }
@@ -109,6 +62,7 @@ class HomeScreen extends React.Component {
 const SimpleApp = StackNavigator({
   Home: { screen: HomeScreen },
   ImageBrowser: { screen: ImageBrowser },
+  OpenedImage: { screen: OpenedImage },
 });
 
 export default class App extends React.Component {
@@ -122,7 +76,7 @@ styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   modalContainer: {
     paddingTop: 20,

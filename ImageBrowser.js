@@ -23,12 +23,6 @@ export default class ImageBrowser extends React.Component {
     title: 'Image Browser',
   }
 
-  // state = {
-  //   images: [],
-  //   loading: true,
-  //   page: 1
-  // }
-
   takePicture() {
      this.camera.capture()
       .then((data) => console.log(data))
@@ -36,7 +30,6 @@ export default class ImageBrowser extends React.Component {
   }
 
   render() {
-    const { params } = this.props.navigation.state;
     return (
       <View style={styles.container}>
         <Camera
